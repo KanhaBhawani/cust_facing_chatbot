@@ -21,7 +21,7 @@ weight = {
     "language": 0.25,
     "date": 0.3
 }
-num_artist = 100
+num_artist = 200
 num_top = 10
 
 class Artist:
@@ -33,7 +33,7 @@ class Artist:
                 "price_per_show": random.randint(1000, 10000),
                 "type": random.choice(["singer", "dancer", "anchor", "musician", "comedian"]),
                 "genre": random.choice(["pop", "classical", "jazz", "rock", "melody", "hiphop"]),
-                "language": random.choice(["English", "Spanish", "French", "hindi", "sanskrit"]),
+                "language": random.choice(["English", "Spanish", "French", "Hindi", "Tamil"]),
                 "booked_dates": [f"2024-07-{random.randint(1, 30)}"],
                 "other_details": f"Details for Artist {i}"
             } for i in range(1, num_artist)
@@ -55,11 +55,11 @@ def calculate_match_score(artist, keywords):
     
     if "price_per_show" in keywords:
         score += weight['price_per_show'] * cal_normal_distribution(keywords['price_per_show'] / artist['price_per_show'])
-    if "type" in keywords and artist["type"] == keywords["type"]:
+    if "type" in keywords and artist["type"].lower() == keywords["type"].lower():
         score += weight["type"]
-    if "genre" in keywords and artist["genre"] == keywords["genre"]:
+    if "genre" in keywords and artist["genre"].lower() == keywords["genre"].lower():
         score += weight["genre"]
-    if "language" in keywords and artist["language"] == keywords["language"]:
+    if "language" in keywords and artist["language"].lower() == keywords["language"].lower():
         score += weight["language"]
     if "date" in keywords:
         query_date = datetime.strptime(keywords["date"], "%Y-%m-%d")
@@ -108,14 +108,14 @@ def find_artist(keywords):
 
     query_score = cal_query_score(keywords)
     print("query score= ", query_score)
-    print(type(keywords['price_per_show']))
+    # print(type(keywords['price_per_show']))
     artist_scores = [calculate_match_score(artist, keywords) for artist in artists]
 
     top_artists = find_matching_artists(artists, keywords)
     for id in top_artists:
         print(id, ", similarity: ", artist_scores[id - 1], " ", artist_scores[id - 1]/query_score)
 
-
+    print()
     ''' Show Data '''
     data = []
     for id in top_artists:
@@ -148,7 +148,11 @@ def find_artist(keywords):
     df = pd.DataFrame(data)
     
     # Display the DataFrame
+    print("---------- RESULT --------------")
     print(df)
+    print("--------------------------------")
+
+    df.to_csv('results.csv')
 
 
     ''' Plotting '''
@@ -172,5 +176,6 @@ def find_artist(keywords):
 
 # Example keywords
 if __name__ == "__main__":
-    keywords = {'date': '2024-07-09', 'price_per_show': 5000, 'type': 'dancer', 'genre': "pop", "language": "English"}
+    # keywords = {'date': '2024-07-09', 'price_per_show': 5000, 'type': 'dancer', 'genre': "pop", "language": "English"}
+    keywords = {'date': '2024-07-15', 'price_per_show': 5000, 'type': 'singer', 'genre': 'pop', 'occasion': 'wedding', 'location': 'Central Park in New York', 'Other Specific Requirements': 'Sound system to be provided', 'language': 'Hindi'}
     find_artist(keywords)
